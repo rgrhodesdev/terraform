@@ -32,11 +32,11 @@ resource "aws_route_table" "dev_public_a_rt" {
 resource "aws_route_table" "dev_private_a_rt" {
 
     vpc_id = aws_vpc.dev_vpc.id
-    route {
+    # route {
 
-        cidr_block = "0.0.0.0/0"
-        instance_id = aws_instance.NATA.id
-    }
+    #     cidr_block = "0.0.0.0/0"
+    #     instance_id = aws_instance.NATA.id
+    # }
 
         tags = {
         Name = "Dev Private RT A"
@@ -81,21 +81,24 @@ resource "aws_route_table_association" "dev_private_art_assoc" {
 }
 
 
-resource "aws_instance" "NATA" {
+# resource "aws_instance" "NATA" {
     
-    ami = "ami-0236d0cbbbe64730c"
-    instance_type = "t2.micro"
-    subnet_id = aws_subnet.publica.id
-    associate_public_ip_address = true
-    vpc_security_group_ids = aws_security_group.NATA_SG.id
-    source_dest_check = false
+    
+#     ami = "ami-0236d0cbbbe64730c"
+#     instance_type = "t2.micro"
+#     subnet_id = aws_subnet.publica.id
+#     associate_public_ip_address = true
+#     vpc_security_group_ids = [aws_security_group.NATA_SG.id]
+#     source_dest_check = false
+#     key_name = "dev03_key"
 
-    tags {
+#     tags = {
 
-        Name = "NAT Instance A"
-    }
+#         Name = "NAT Instance A"
+#     }
 
-}
+
+# }
 
 resource "aws_security_group" "NATA_SG" {
 
@@ -105,10 +108,18 @@ resource "aws_security_group" "NATA_SG" {
 
     ingress {
 
-        protocol = 0
+        protocol = "-1"
         from_port = 0
-        cidr_blocks = aws_vpc.dev_vpc.cidr_block
+        to_port = 0
+        cidr_blocks = [aws_vpc.dev_vpc.cidr_block]
 
+    }
+
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
     }
 
 
