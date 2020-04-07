@@ -90,6 +90,11 @@ resource "aws_instance" "NATA" {
     vpc_security_group_ids = aws_security_group.NATA_SG.id
     source_dest_check = false
 
+    tags {
+
+        Name = "NAT Instance A"
+    }
+
 }
 
 resource "aws_security_group" "NATA_SG" {
