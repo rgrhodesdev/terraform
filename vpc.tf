@@ -44,6 +44,21 @@ resource "aws_route_table" "dev_private_a_rt" {
   
 }
 
+resource "aws_route_table" "dev_private_b_rt" {
+
+    vpc_id = aws_vpc.dev_vpc.id
+    # route {
+
+    #     cidr_block = "0.0.0.0/0"
+    #     instance_id = aws_instance.NATA.id
+    # }
+
+        tags = {
+        Name = "Dev Private RT B"
+    }
+  
+}
+
 
 resource "aws_subnet" "publica" {
     vpc_id = aws_vpc.dev_vpc.id
@@ -66,6 +81,17 @@ resource "aws_subnet" "privatea" {
 
 }
 
+resource "aws_subnet" "privateb" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = "192.168.5.0/24"
+
+    tags = {
+
+        Name = "Dev Private B"
+    }
+
+}
+
 resource "aws_route_table_association" "dev_public_a_rt_assoc" {
 
     route_table_id = aws_route_table.dev_public_a_rt.id
@@ -77,6 +103,13 @@ resource "aws_route_table_association" "dev_private_art_assoc" {
 
     route_table_id = aws_route_table.dev_private_a_rt.id
     subnet_id = aws_subnet.privatea.id
+
+}
+
+resource "aws_route_table_association" "dev_private_brt_assoc" {
+
+    route_table_id = aws_route_table.dev_private_b_rt.id
+    subnet_id = aws_subnet.privateb.id
 
 }
 
