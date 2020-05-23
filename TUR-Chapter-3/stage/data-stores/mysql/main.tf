@@ -15,6 +15,18 @@ terraform {
     }
 }
 
+data "terraform_remote_state" "vpc" {
+  backend = "s3" 
+
+  config = {
+    bucket = "rgrhodesdev03-terraform-state-file"
+    key = "stage/vpc/terraform.tfstate"
+    region = "eu-west-1"
+  }
+
+}
+
+/*
 data "aws_vpcs" "stage" {
 
 
@@ -22,10 +34,11 @@ data "aws_vpcs" "stage" {
     Name = "stage"
   }
 }
+*/
 
 data "aws_subnet_ids" "private" {
-  vpc_id = element(tolist(data.aws_vpcs.stage.ids), 0)
-
+  //vpc_id = element(tolist(data.aws_vpcs.stage.ids), 0)
+  vpc_id = data.terraform_remote_state.vpc.outputs.vpcid
   tags = {
     Name = "*Private*"
   }
@@ -52,7 +65,8 @@ resource "aws_db_subnet_group" "mysql_subnet_group" {
 
 resource "aws_security_group" "mysql_rds_sg" {
 
-    vpc_id = element(tolist(data.aws_vpcs.stage.ids), 0)
+    //vpc_id = element(tolist(data.aws_vpcs.stage.ids), 0)
+    vpc_id = data.terraform_remote_state.vpc.outputs.vpcid
     ingress {
         cidr_blocks = ["192.168.4.0/24", "192.168.5.0/24"]
         protocol = "tcp"
