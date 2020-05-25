@@ -5,7 +5,7 @@ provider "aws" {
 terraform {
     backend "s3" {
         bucket = "rgrhodesdev03-terraform-state-file"
-        key = "stage/services/webserver-cluster/terraform.tfstate"
+        key = "prod/services/webserver-cluster/terraform.tfstate"
         region = "eu-west-1"
 
         dynamodb_table = "rgrhodesdev03-terraform-locks"
@@ -20,8 +20,8 @@ module "webserver-cluster" {
 
     source ="../../../modules/services/webserver-cluster"
 
-    cluster_name = "webservers-stage"
+    cluster_name = "webservers-prod"
     db_remote_state_bucket = "rgrhodesdev03-terraform-state-file"
-    db_remote_state_key = "stage/data-stores/mysql/terraform.tfstate"
+    db_remote_state_key = "prod/data-stores/mysql/terraform.tfstate"
 
 }
