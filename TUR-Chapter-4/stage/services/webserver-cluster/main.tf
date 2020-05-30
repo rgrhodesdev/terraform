@@ -23,5 +23,6 @@ module "webserver-cluster" {
     cluster_name = "webservers-stage"
     db_remote_state_bucket = "rgrhodesdev03-terraform-state-file"
     db_remote_state_key = "stage/data-stores/mysql/terraform.tfstate"
+    environment = "Stage"
 
 }
