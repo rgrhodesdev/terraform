@@ -13,3 +13,8 @@ variable "vpc_remote_state_key" {
     type = string
 
 }
+
+variable "environment" {
+  description = "Environment Type"
+  type        = string
+}

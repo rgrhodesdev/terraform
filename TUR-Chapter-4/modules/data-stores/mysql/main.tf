@@ -11,19 +11,17 @@ data "terraform_remote_state" "vpc" {
 
 }
 
-/*
-data "aws_vpcs" "stage" {
+data "aws_vpcs" "environment" {
 
 
   tags = {
-    Name = "stage"
+    Name = var.environment
   }
 }
-*/
+
 
 data "aws_subnet_ids" "private" {
-  //vpc_id = element(tolist(data.aws_vpcs.stage.ids), 0)
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpcid
+  vpc_id = element(tolist(data.aws_vpcs.environment.ids), 0)
   tags = {
     Name = "*Private*"
   }
@@ -50,8 +48,7 @@ resource "aws_db_subnet_group" "mysql_subnet_group" {
 
 resource "aws_security_group" "mysql_rds_sg" {
 
-    //vpc_id = element(tolist(data.aws_vpcs.stage.ids), 0)
-    vpc_id = data.terraform_remote_state.vpc.outputs.vpcid
+    vpc_id = element(tolist(data.aws_vpcs.environment.ids), 0)
     ingress {
         cidr_blocks = ["192.168.4.0/24", "192.168.5.0/24"]
         protocol = "tcp"
@@ -79,7 +76,7 @@ resource "aws_db_instance" "example" {
     engine = "mysql"
     allocated_storage = "10"
     instance_class = "db.t2.micro"
-    name = "${var.db_name}-database"
+    name = "${var.db_name}database"
     username = jsondecode(data.aws_secretsmanager_secret_version.db_creds.secret_string)["username"]
     password = jsondecode(data.aws_secretsmanager_secret_version.db_creds.secret_string)["password"]
     db_subnet_group_name = "${var.db_name}-mysql"

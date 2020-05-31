@@ -19,8 +19,9 @@ terraform {
 module "database_mysql" {
     source ="../../../modules/data-stores/mysql"
 
-    db_name = "database-stage"
+    db_name = "stage"
     vpc_remote_state_bucket = "rgrhodesdev03-terraform-state-file"
     vpc_remote_state_key = "stage/vpc/terraform.tfstate"
+    environment = "Stage"
 
 }
