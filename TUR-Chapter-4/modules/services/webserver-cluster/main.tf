@@ -16,6 +16,7 @@ data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
 
   vars = {
+    app_env = var.environment
     server_port = var.server_port
     db_address  = data.terraform_remote_state.db.outputs.address
     db_port     = data.terraform_remote_state.db.outputs.port
@@ -172,38 +173,63 @@ resource "aws_security_group" "instance" {
   name   = "${var.cluster_name}-instance"
   vpc_id = element(tolist(data.aws_vpcs.environment.ids), 0)
 
-  ingress {
 
-    from_port       = var.server_port
-    to_port         = var.server_port
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb.id]
-  }
 }
 
-resource "aws_security_group" "alb" {
+resource "aws_security_group_rule" "allow_instance_inbound" {
+  type = "ingress"
+  security_group_id = aws_security_group.instance.id
 
-  name   = "${var.cluster_name}-alb"
-  vpc_id = element(tolist(data.aws_vpcs.environment.ids), 0)
+  from_port       = var.server_port
+  to_port         = var.server_port
+  protocol        = "tcp"
+  source_security_group_id = aws_security_group.alb.id
 
-  ingress {
+}
 
-    from_port   = var.alb_port
-    to_port     = var.alb_port
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-
-  }
-
-  egress {
+resource "aws_security_group_rule" "allow_instance_outbound" {
+  type = "egress"
+  security_group_id = aws_security_group.instance.id
 
     from_port   = 0
     to_port     = 0
     protocol    = -1
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
 
 }
+
+
+
+resource "aws_security_group" "alb" {
+
+  name   = "${var.cluster_name}-alb"
+  vpc_id = element(tolist(data.aws_vpcs.environment.ids), 0)
+}
+
+resource "aws_security_group_rule" "allow_alb_inbound" {
+  type = "ingress"
+  security_group_id = aws_security_group.alb.id
+
+  from_port   = var.alb_port
+  to_port     = var.alb_port
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+
+}
+
+resource "aws_security_group_rule" "allow_alb_outbound" {
+  type = "egress"
+  security_group_id = aws_security_group.alb.id
+
+  from_port   = 0
+  to_port     = 0
+  protocol    = -1
+  cidr_blocks = ["0.0.0.0/0"]
+
+}
+
+
+
+
 
 

@@ -3,6 +3,12 @@ variable "db_name" {
     type = string
 }
 
+variable "db_creds_secret" {
+    description = "DB Credentials Secret Manager String"
+    type = string
+
+}
+
 variable "vpc_remote_state_bucket" {
     description = "The name of the S3 bucket for the vpc remote state"
     type = string
